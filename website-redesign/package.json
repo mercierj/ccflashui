@@ -1,0 +1,11 @@
+{
+  "name": "website-redesign",
+  "version": "1.0.0",
+  "description": "Redesign any website with Flash UI while keeping exact content",
+  "main": "website-redesign.js",
+  "dependencies": {
+    "playwright": "^1.40.0",
+    "cheerio": "^1.0.0-rc.12",
+    "node-fetch": "^2.7.0"
+  }
+}
