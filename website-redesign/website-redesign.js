@@ -1,21 +1,24 @@
 #!/usr/bin/env node
-const { spawn } = require('child_process');
+const { spawn, execSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
 
-// Check dependencies before importing
 const SKILL_DIR = __dirname;
 const NODE_MODULES = path.join(SKILL_DIR, 'node_modules');
 const FLASH_UI_DIR = path.join(__dirname, '..', 'flash-ui-codegen');
 const FLASH_UI_SCRIPT = path.join(FLASH_UI_DIR, 'flash-ui.js');
 
-// Check own dependencies
+// Check and install own dependencies if needed
 if (!fs.existsSync(NODE_MODULES)) {
-  console.error('\n❌ Dependencies not installed!');
-  console.error('\nRun this command:');
-  console.error(`  cd ${SKILL_DIR} && npm install\n`);
-  process.exit(1);
+  console.error('Installing npm dependencies for website-redesign...');
+  try {
+    execSync('npm install', { cwd: SKILL_DIR, stdio: 'inherit' });
+    console.error('Dependencies installed.\n');
+  } catch (e) {
+    console.error('Failed to install dependencies:', e.message);
+    process.exit(1);
+  }
 }
 
 // Check if flash-ui-codegen skill exists
@@ -24,16 +27,6 @@ if (!fs.existsSync(FLASH_UI_SCRIPT)) {
   console.error('\nThis skill depends on flash-ui-codegen.');
   console.error('Make sure it is installed at: ~/.claude/skills/flash-ui-codegen/');
   console.error('\nExpected path: ' + FLASH_UI_SCRIPT + '\n');
-  process.exit(1);
-}
-
-// Check if flash-ui-codegen has its dependencies
-if (!fs.existsSync(path.join(FLASH_UI_DIR, 'node_modules'))) {
-  console.error('\n❌ flash-ui-codegen dependencies not installed!');
-  console.error('\nRun these commands:');
-  console.error(`  cd ${FLASH_UI_DIR}`);
-  console.error('  npm install');
-  console.error('  npx playwright install chromium\n');
   process.exit(1);
 }
 

@@ -3,35 +3,12 @@ const path = require('path');
 const os = require('os');
 const fs = require('fs');
 const readline = require('readline');
+const { execSync } = require('child_process');
 
-// Check dependencies before importing
 const SKILL_DIR = __dirname;
 const NODE_MODULES = path.join(SKILL_DIR, 'node_modules');
 
-if (!fs.existsSync(NODE_MODULES)) {
-  console.error('\n❌ Dependencies not installed!');
-  console.error('\nRun these commands:');
-  console.error(`  cd ${SKILL_DIR}`);
-  console.error('  npm install');
-  console.error('  npx playwright install chromium\n');
-  process.exit(1);
-}
-
-// Check if playwright is installed
-try {
-  require.resolve('playwright');
-} catch (e) {
-  console.error('\n❌ Playwright not found!');
-  console.error('\nRun these commands:');
-  console.error(`  cd ${SKILL_DIR}`);
-  console.error('  npm install');
-  console.error('  npx playwright install chromium\n');
-  process.exit(1);
-}
-
-const { chromium } = require('playwright');
-
-// Check if Chromium browser is installed (cross-platform)
+// Get Playwright cache directory (cross-platform)
 function getPlaywrightCacheDir() {
   const platform = process.platform;
   if (platform === 'darwin') {
@@ -43,16 +20,63 @@ function getPlaywrightCacheDir() {
   }
 }
 
-const playwrightCacheDir = getPlaywrightCacheDir();
-const chromiumExists = fs.existsSync(playwrightCacheDir) &&
-  fs.readdirSync(playwrightCacheDir).some(f => f.startsWith('chromium'));
+// Check and install dependencies if needed
+function ensureDependencies() {
+  let needsNpmInstall = false;
+  let needsChromium = false;
 
-if (!chromiumExists) {
-  console.error('\n❌ Playwright Chromium browser not installed!');
-  console.error('\nRun this command:');
-  console.error('  npx playwright install chromium\n');
-  process.exit(1);
+  // Check node_modules
+  if (!fs.existsSync(NODE_MODULES)) {
+    needsNpmInstall = true;
+  } else {
+    // Check if playwright is installed
+    try {
+      require.resolve('playwright');
+    } catch (e) {
+      needsNpmInstall = true;
+    }
+  }
+
+  // Check Chromium browser
+  const playwrightCacheDir = getPlaywrightCacheDir();
+  const chromiumExists = fs.existsSync(playwrightCacheDir) &&
+    fs.readdirSync(playwrightCacheDir).some(f => f.startsWith('chromium'));
+  if (!chromiumExists) {
+    needsChromium = true;
+  }
+
+  // Install if needed
+  if (needsNpmInstall) {
+    console.error('Installing npm dependencies...');
+    try {
+      execSync('npm install', { cwd: SKILL_DIR, stdio: 'inherit' });
+      console.error('npm dependencies installed.');
+    } catch (e) {
+      console.error('Failed to install npm dependencies:', e.message);
+      process.exit(1);
+    }
+  }
+
+  if (needsChromium) {
+    console.error('Installing Playwright Chromium browser...');
+    try {
+      execSync('npx playwright install chromium', { cwd: SKILL_DIR, stdio: 'inherit' });
+      console.error('Chromium browser installed.');
+    } catch (e) {
+      console.error('Failed to install Chromium:', e.message);
+      process.exit(1);
+    }
+  }
+
+  if (needsNpmInstall || needsChromium) {
+    console.error('All dependencies ready.\n');
+  }
 }
+
+// Ensure all dependencies before proceeding
+ensureDependencies();
+
+const { chromium } = require('playwright');
 
 const SESSION_DIR = path.join(os.homedir(), '.claude', 'flash-ui-chrome-profile');
 
