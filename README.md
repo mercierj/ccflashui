@@ -1,42 +1,32 @@
 # Claude Code Flash UI Skills
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org/)
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-Skills-purple.svg)](https://claude.ai/claude-code)
+
 Custom skills for [Claude Code](https://claude.ai/claude-code) that integrate with Google AI Studio's Flash UI for automated UI code generation.
 
-## Skills Included
+## Features
 
-### `/flash-ui-codegen`
-Generate UI code using Google AI Studio Flash UI. Opens a browser, lets you interact with Flash UI, and extracts the generated code.
+| Skill | Description |
+|-------|-------------|
+| `/flash-ui-codegen` | Generate UI code using Google AI Studio Flash UI |
+| `/website-redesign` | Redesign any website while preserving exact text content |
 
-### `/website-redesign`
-Redesign any website with a modern look. Fetches a website, extracts its text content, and generates a fresh design while preserving the exact original text.
-
-## Installation
+## Quick Install
 
 ```bash
-# 1. Clone this repo into your Claude skills directory
-git clone git@github.com:mercierj/ccflashui.git ~/.claude/skills/ccflashui
-
-# 2. Move skills to the correct location
-mv ~/.claude/skills/ccflashui/* ~/.claude/skills/
-rm -rf ~/.claude/skills/ccflashui
-
-# 3. Install flash-ui-codegen dependencies
-cd ~/.claude/skills/flash-ui-codegen
-npm install
-npx playwright install chromium
-
-# 4. Install website-redesign dependencies
-cd ~/.claude/skills/website-redesign
-npm install
+curl -fsSL https://raw.githubusercontent.com/mercierj/ccflashui/main/install.sh | bash
 ```
 
-## Alternative Installation (Direct Clone)
+Or manually:
 
 ```bash
-# Clone directly into skills folder structure
+# Clone into skills directory
+mkdir -p ~/.claude/skills
 cd ~/.claude/skills
-git clone git@github.com:mercierj/ccflashui.git temp
-mv temp/* .
+git clone https://github.com/mercierj/ccflashui.git temp
+mv temp/flash-ui-codegen temp/website-redesign .
 rm -rf temp
 
 # Install dependencies
@@ -44,34 +34,67 @@ cd flash-ui-codegen && npm install && npx playwright install chromium
 cd ../website-redesign && npm install
 ```
 
-## First Run
-
-On first use, you'll be prompted to log into your Google account for AI Studio access. Your session is saved in `~/.claude/flash-ui-chrome-profile/` so you only need to log in once.
-
 ## Usage
 
-In Claude Code:
+In Claude Code CLI:
 
-```
-/flash-ui-codegen "Create a modern dashboard with sidebar navigation"
-```
+```bash
+# Generate UI from a prompt
+/flash-ui-codegen "Create a modern dashboard with dark theme and sidebar"
 
-```
+# Redesign an existing website
 /website-redesign https://example.com
 ```
 
 ## How It Works
 
-1. **Flash UI Codegen**: Opens Chrome with Google AI Studio's Flash UI, pastes your prompt, waits for you to iterate and refine, then extracts the generated code when you click "SEND TO CLAUDE".
+### Flash UI Codegen
 
-2. **Website Redesign**: Fetches the target URL, parses all text content (headings, paragraphs, navigation, buttons), analyzes the business context, builds a detailed prompt, and sends it to Flash UI for redesign.
+1. Opens Chrome with Google AI Studio's Flash UI
+2. Pastes your prompt automatically
+3. You can iterate and refine using Flash UI's chat
+4. Click "SEND TO CLAUDE" when satisfied
+5. Code is extracted and returned to Claude Code
+
+### Website Redesign
+
+1. Fetches the target URL
+2. Parses text content (headings, paragraphs, navigation, buttons)
+3. Analyzes business context (sector, audience, conversion goals)
+4. Builds a detailed prompt preserving exact text
+5. Sends to Flash UI for modern redesign
 
 ## Requirements
 
-- Node.js 18+
-- Claude Code CLI
-- Google account (for AI Studio access)
+- **Node.js** 18+
+- **Claude Code** CLI installed
+- **Google Account** for AI Studio access
+
+## First Run
+
+On first use, you'll be prompted to log into your Google account. Your session is saved locally in `~/.claude/flash-ui-chrome-profile/` so you only need to log in once.
+
+## Troubleshooting
+
+If you see dependency errors, the skills will show exactly what's missing:
+
+```
+❌ Dependencies not installed!
+
+Run these commands:
+  cd ~/.claude/skills/flash-ui-codegen
+  npm install
+  npx playwright install chromium
+```
+
+## Contributing
+
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 
-MIT
+[MIT](LICENSE) - feel free to use, modify, and distribute.
+
+## Author
+
+Created by [@mercierj](https://github.com/mercierj)
